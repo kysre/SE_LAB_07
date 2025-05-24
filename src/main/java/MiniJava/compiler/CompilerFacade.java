@@ -18,10 +18,7 @@ public class CompilerFacade {
             sourceScanner.close();
             return !ErrorHandler.hasError;
         } catch (FileNotFoundException e) {
-            ErrorHandler.printError("Source file not found: " + sourceFilePath);
-            return false;
-        } catch (Exception e) {
-            ErrorHandler.printError("Compilation error: " + e.getMessage());
+            ErrorHandler.printError(e.getMessage());
             return false;
         }
     }
