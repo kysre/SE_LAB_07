@@ -23,4 +23,8 @@
 - فیلدهای عمومی کلاس `Address` را به خصوصی تبدیل کرده و متدهای `getter` برای دسترسی به آن‌ها اضافه کردم.
 همچنین تغییرات لازم در `CodeGenerator` را نیز انجام دادم.
 
+### استفاده از الگوی `Replace Magic Number with Symbolic Constant`
+
+- اعداد جادویی (۰ تا ۳۳) موجود در `switch statement` متد `semanticFunction` کلاس `CodeGenerator` را با ثابت‌های معنادار جایگزین کردم.
+
 ## سوالات

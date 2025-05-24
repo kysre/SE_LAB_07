@@ -19,6 +19,42 @@ public class CodeGenerator {
     private Stack<String> callStack = new Stack<>();
     private SymbolTable symbolTable;
 
+    // Refactor: Replace Magic Number with Symbolic Constant
+    private static final int SEMANTIC_FUNC_RETURN = 0;
+    private static final int SEMANTIC_FUNC_CHECK_ID = 1;
+    private static final int SEMANTIC_FUNC_PID = 2;
+    private static final int SEMANTIC_FUNC_FPID = 3;
+    private static final int SEMANTIC_FUNC_KPID = 4;
+    private static final int SEMANTIC_FUNC_INTPID = 5;
+    private static final int SEMANTIC_FUNC_START_CALL = 6;
+    private static final int SEMANTIC_FUNC_CALL = 7;
+    private static final int SEMANTIC_FUNC_ARG = 8;
+    private static final int SEMANTIC_FUNC_ASSIGN = 9;
+    private static final int SEMANTIC_FUNC_ADD = 10;
+    private static final int SEMANTIC_FUNC_SUB = 11;
+    private static final int SEMANTIC_FUNC_MULT = 12;
+    private static final int SEMANTIC_FUNC_LABEL = 13;
+    private static final int SEMANTIC_FUNC_SAVE = 14;
+    private static final int SEMANTIC_FUNC_WHILE = 15;
+    private static final int SEMANTIC_FUNC_JPF_SAVE = 16;
+    private static final int SEMANTIC_FUNC_JP_HERE = 17;
+    private static final int SEMANTIC_FUNC_PRINT = 18;
+    private static final int SEMANTIC_FUNC_EQUAL = 19;
+    private static final int SEMANTIC_FUNC_LESS_THAN = 20;
+    private static final int SEMANTIC_FUNC_AND = 21;
+    private static final int SEMANTIC_FUNC_NOT = 22;
+    private static final int SEMANTIC_FUNC_DEF_CLASS = 23;
+    private static final int SEMANTIC_FUNC_DEF_METHOD = 24;
+    private static final int SEMANTIC_FUNC_POP_CLASS = 25;
+    private static final int SEMANTIC_FUNC_EXTEND = 26;
+    private static final int SEMANTIC_FUNC_DEF_FIELD = 27;
+    private static final int SEMANTIC_FUNC_DEF_VAR = 28;
+    private static final int SEMANTIC_FUNC_METHOD_RETURN = 29;
+    private static final int SEMANTIC_FUNC_DEF_PARAM = 30;
+    private static final int SEMANTIC_FUNC_LAST_TYPE_BOOL = 31;
+    private static final int SEMANTIC_FUNC_LAST_TYPE_INT = 32;
+    private static final int SEMANTIC_FUNC_DEF_MAIN = 33;
+
     public CodeGenerator() {
         symbolTable = new SymbolTable(memory);
         // TODO
@@ -31,105 +67,105 @@ public class CodeGenerator {
     public void semanticFunction(int func, Token next) {
         Log.print("codegenerator : " + func);
         switch (func) {
-            case 0:
+            case SEMANTIC_FUNC_RETURN:
                 return;
-            case 1:
+            case SEMANTIC_FUNC_CHECK_ID:
                 checkID();
                 break;
-            case 2:
+            case SEMANTIC_FUNC_PID:
                 pid(next);
                 break;
-            case 3:
+            case SEMANTIC_FUNC_FPID:
                 fpid();
                 break;
-            case 4:
+            case SEMANTIC_FUNC_KPID:
                 kpid(next);
                 break;
-            case 5:
+            case SEMANTIC_FUNC_INTPID:
                 intpid(next);
                 break;
-            case 6:
+            case SEMANTIC_FUNC_START_CALL:
                 startCall();
                 break;
-            case 7:
+            case SEMANTIC_FUNC_CALL:
                 call();
                 break;
-            case 8:
+            case SEMANTIC_FUNC_ARG:
                 arg();
                 break;
-            case 9:
+            case SEMANTIC_FUNC_ASSIGN:
                 assign();
                 break;
-            case 10:
+            case SEMANTIC_FUNC_ADD:
                 add();
                 break;
-            case 11:
+            case SEMANTIC_FUNC_SUB:
                 sub();
                 break;
-            case 12:
+            case SEMANTIC_FUNC_MULT:
                 mult();
                 break;
-            case 13:
+            case SEMANTIC_FUNC_LABEL:
                 label();
                 break;
-            case 14:
+            case SEMANTIC_FUNC_SAVE:
                 save();
                 break;
-            case 15:
+            case SEMANTIC_FUNC_WHILE:
                 _while();
                 break;
-            case 16:
+            case SEMANTIC_FUNC_JPF_SAVE:
                 jpf_save();
                 break;
-            case 17:
+            case SEMANTIC_FUNC_JP_HERE:
                 jpHere();
                 break;
-            case 18:
+            case SEMANTIC_FUNC_PRINT:
                 print();
                 break;
-            case 19:
+            case SEMANTIC_FUNC_EQUAL:
                 equal();
                 break;
-            case 20:
+            case SEMANTIC_FUNC_LESS_THAN:
                 less_than();
                 break;
-            case 21:
+            case SEMANTIC_FUNC_AND:
                 and();
                 break;
-            case 22:
+            case SEMANTIC_FUNC_NOT:
                 not();
                 break;
-            case 23:
+            case SEMANTIC_FUNC_DEF_CLASS:
                 defClass();
                 break;
-            case 24:
+            case SEMANTIC_FUNC_DEF_METHOD:
                 defMethod();
                 break;
-            case 25:
+            case SEMANTIC_FUNC_POP_CLASS:
                 popClass();
                 break;
-            case 26:
+            case SEMANTIC_FUNC_EXTEND:
                 extend();
                 break;
-            case 27:
+            case SEMANTIC_FUNC_DEF_FIELD:
                 defField();
                 break;
-            case 28:
+            case SEMANTIC_FUNC_DEF_VAR:
                 defVar();
                 break;
-            case 29:
+            case SEMANTIC_FUNC_METHOD_RETURN:
                 methodReturn();
                 break;
-            case 30:
+            case SEMANTIC_FUNC_DEF_PARAM:
                 defParam();
                 break;
-            case 31:
+            case SEMANTIC_FUNC_LAST_TYPE_BOOL:
                 lastTypeBool();
                 break;
-            case 32:
+            case SEMANTIC_FUNC_LAST_TYPE_INT:
                 lastTypeInt();
                 break;
-            case 33:
+            case SEMANTIC_FUNC_DEF_MAIN:
                 defMain();
                 break;
         }
