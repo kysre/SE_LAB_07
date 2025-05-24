@@ -5,6 +5,8 @@
 ### استفاده از الگوی `Facade`
 
 - `CompilerFacade` ایجاد کردم که پیچیدگی‌های مدیریت `Parser`, `ErrorHandler` و عملیات فایل را پنهان می‌کند.
+- `ParserSubsystemFacade` ایجاد کردم که مقداردهی پیچیده `ParseTable`, `Rules`, `CodeGenerator` را مدیریت می‌کند.
+این `facade` باعث ساده‌شدن کنستراکتور کلاس `Parser` و جداسازی منطق مقداردهی از منطق پارسینگ شده است.
 
 ### استفاده `polymorphism` به جای شرط
 

@@ -1,8 +1,5 @@
 package MiniJava.parser;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Stack;
 import java.util.EnumMap;
@@ -31,20 +28,12 @@ public class Parser {
     public Parser() {
         parsStack = new Stack<Integer>();
         parsStack.push(0);
-        try {
-            parseTable = new ParseTable(Files.readAllLines(Paths.get("src/main/resources/parseTable")).get(0));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        rules = new ArrayList<Rule>();
-        try {
-            for (String stringRule : Files.readAllLines(Paths.get("src/main/resources/Rules"))) {
-                rules.add(new Rule(stringRule));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        cg = new CodeGenerator();
+        
+        // Refactor: Use Facade
+        ParserSubsystemFacade subsystemFacade = ParserSubsystemFacade.createInitialized();
+        this.parseTable = subsystemFacade.getParseTable();
+        this.rules = subsystemFacade.getRules();
+        this.cg = subsystemFacade.getCodeGenerator();
     }
 
     public void startParse(java.util.Scanner sc) {
@@ -60,7 +49,7 @@ public class Parser {
                 Log.print(currentAction.toString());
                 //Log.print("");
 
-                // Replace switch statement with polymorphism
+                // Refactor: Replace switch statement with polymorphism
                 ActionHandler handler = handlers.get(currentAction.action);
                 ActionHandler.ParseResult result = handler.execute(
                     parsStack, parseTable, rules, cg, lexicalAnalyzer, currentAction, lookAhead
