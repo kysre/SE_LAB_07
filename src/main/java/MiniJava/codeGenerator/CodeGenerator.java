@@ -18,6 +18,9 @@ public class CodeGenerator {
     private Stack<String> symbolStack = new Stack<>();
     private Stack<String> callStack = new Stack<>();
     private SymbolTable symbolTable;
+    private ExpressionGenerator expressionGenerator;
+    private SymbolDefinitionHandler symbolDefinitionHandler;
+    private ControlFlowCodeGenerator controlFlowGenerator;
 
     // Refactor: Replace Magic Number with Symbolic Constant
     private static final int SEMANTIC_FUNC_RETURN = 0;
@@ -57,6 +60,9 @@ public class CodeGenerator {
 
     public CodeGenerator() {
         symbolTable = new SymbolTable(memory);
+        expressionGenerator = new ExpressionGenerator(memory, ss);
+        symbolDefinitionHandler = new SymbolDefinitionHandler(symbolTable, memory, ss, symbolStack);
+        controlFlowGenerator = new ControlFlowCodeGenerator(memory, ss);
         // TODO
     }
 
@@ -97,67 +103,67 @@ public class CodeGenerator {
                 assign();
                 break;
             case SEMANTIC_FUNC_ADD:
-                add();
+                expressionGenerator.add();
                 break;
             case SEMANTIC_FUNC_SUB:
-                sub();
+                expressionGenerator.sub();
                 break;
             case SEMANTIC_FUNC_MULT:
-                mult();
+                expressionGenerator.mult();
                 break;
             case SEMANTIC_FUNC_LABEL:
-                label();
+                controlFlowGenerator.label();
                 break;
             case SEMANTIC_FUNC_SAVE:
-                save();
+                controlFlowGenerator.save();
                 break;
             case SEMANTIC_FUNC_WHILE:
-                _while();
+                controlFlowGenerator._while();
                 break;
             case SEMANTIC_FUNC_JPF_SAVE:
-                jpf_save();
+                controlFlowGenerator.jpf_save();
                 break;
             case SEMANTIC_FUNC_JP_HERE:
-                jpHere();
+                controlFlowGenerator.jpHere();
                 break;
             case SEMANTIC_FUNC_PRINT:
-                print();
+                expressionGenerator.print();
                 break;
             case SEMANTIC_FUNC_EQUAL:
-                equal();
+                expressionGenerator.equal();
                 break;
             case SEMANTIC_FUNC_LESS_THAN:
-                less_than();
+                expressionGenerator.less_than();
                 break;
             case SEMANTIC_FUNC_AND:
-                and();
+                expressionGenerator.and();
                 break;
             case SEMANTIC_FUNC_NOT:
-                not();
+                expressionGenerator.not();
                 break;
             case SEMANTIC_FUNC_DEF_CLASS:
-                defClass();
+                symbolDefinitionHandler.defClass();
                 break;
             case SEMANTIC_FUNC_DEF_METHOD:
-                defMethod();
+                symbolDefinitionHandler.defMethod();
                 break;
             case SEMANTIC_FUNC_POP_CLASS:
-                popClass();
+                symbolDefinitionHandler.popClass();
                 break;
             case SEMANTIC_FUNC_EXTEND:
-                extend();
+                symbolDefinitionHandler.extend();
                 break;
             case SEMANTIC_FUNC_DEF_FIELD:
-                defField();
+                symbolDefinitionHandler.defField();
                 break;
             case SEMANTIC_FUNC_DEF_VAR:
-                defVar();
+                symbolDefinitionHandler.defVar();
                 break;
             case SEMANTIC_FUNC_METHOD_RETURN:
                 methodReturn();
                 break;
             case SEMANTIC_FUNC_DEF_PARAM:
-                defParam();
+                symbolDefinitionHandler.defParam();
                 break;
             case SEMANTIC_FUNC_LAST_TYPE_BOOL:
                 lastTypeBool();
@@ -338,158 +344,6 @@ public class CodeGenerator {
         memory.add3AddressCode(Operation.ASSIGN, s1, s2, null);
     }
 
-    public void add() {
-        Address temp = new Address(memory.getTemp(), varType.Int);
-        Address s2 = ss.pop();
-        Address s1 = ss.pop();
-
-        if (s1.getVarType() != varType.Int || s2.getVarType() != varType.Int) {
-            ErrorHandler.printError("In add two operands must be integer");
-        }
-        memory.add3AddressCode(Operation.ADD, s1, s2, temp);
-        ss.push(temp);
-    }
-
-    public void sub() {
-        Address temp = new Address(memory.getTemp(), varType.Int);
-        Address s2 = ss.pop();
-        Address s1 = ss.pop();
-        if (s1.getVarType() != varType.Int || s2.getVarType() != varType.Int) {
-            ErrorHandler.printError("In sub two operands must be integer");
-        }
-        memory.add3AddressCode(Operation.SUB, s1, s2, temp);
-        ss.push(temp);
-    }
-
-    public void mult() {
-        Address temp = new Address(memory.getTemp(), varType.Int);
-        Address s2 = ss.pop();
-        Address s1 = ss.pop();
-        if (s1.getVarType() != varType.Int || s2.getVarType() != varType.Int) {
-            ErrorHandler.printError("In mult two operands must be integer");
-        }
-        memory.add3AddressCode(Operation.MULT, s1, s2, temp);
-        // memory.saveMemory();
-        ss.push(temp);
-    }
-
-    public void label() {
-        ss.push(new Address(memory.getCurrentCodeBlockAddress(), varType.Address));
-    }
-
-    public void save() {
-        ss.push(new Address(memory.saveMemory(), varType.Address));
-    }
-
-    public void _while() {
-        memory.add3AddressCode(ss.pop().getNum(), Operation.JPF, ss.pop(),
-                new Address(memory.getCurrentCodeBlockAddress() + 1, varType.Address), null);
-        memory.add3AddressCode(Operation.JP, ss.pop(), null, null);
-    }
-
-    public void jpf_save() {
-        Address save = new Address(memory.saveMemory(), varType.Address);
-        memory.add3AddressCode(ss.pop().getNum(), Operation.JPF, ss.pop(),
-                new Address(memory.getCurrentCodeBlockAddress(), varType.Address), null);
-        ss.push(save);
-    }
-
-    public void jpHere() {
-        memory.add3AddressCode(ss.pop().getNum(), Operation.JP,
-                new Address(memory.getCurrentCodeBlockAddress(), varType.Address), null, null);
-    }
-
-    public void print() {
-        memory.add3AddressCode(Operation.PRINT, ss.pop(), null, null);
-    }
-
-    public void equal() {
-        Address temp = new Address(memory.getTemp(), varType.Bool);
-        Address s2 = ss.pop();
-        Address s1 = ss.pop();
-        if (s1.getVarType() != s2.getVarType()) {
-            ErrorHandler.printError("The type of operands in equal operator is different");
-        }
-        memory.add3AddressCode(Operation.EQ, s1, s2, temp);
-        ss.push(temp);
-    }
-
-    public void less_than() {
-        Address temp = new Address(memory.getTemp(), varType.Bool);
-        Address s2 = ss.pop();
-        Address s1 = ss.pop();
-        if (s1.getVarType() != varType.Int || s2.getVarType() != varType.Int) {
-            ErrorHandler.printError("The type of operands in less than operator is different");
-        }
-        memory.add3AddressCode(Operation.LT, s1, s2, temp);
-        ss.push(temp);
-    }
-
-    public void and() {
-        Address temp = new Address(memory.getTemp(), varType.Bool);
-        Address s2 = ss.pop();
-        Address s1 = ss.pop();
-        if (s1.getVarType() != varType.Bool || s2.getVarType() != varType.Bool) {
-            ErrorHandler.printError("In and operator the operands must be boolean");
-        }
-        memory.add3AddressCode(Operation.AND, s1, s2, temp);
-        ss.push(temp);
-    }
-
-    public void not() {
-        Address temp = new Address(memory.getTemp(), varType.Bool);
-        Address s2 = ss.pop();
-        Address s1 = ss.pop();
-        if (s2.getVarType() != varType.Bool) {
-            ErrorHandler.printError("In not operator the operand must be boolean");
-        }
-        memory.add3AddressCode(Operation.NOT, s1, s2, temp);
-        ss.push(temp);
-    }
-
-    public void defClass() {
-        ss.pop();
-        symbolTable.addClass(symbolStack.peek());
-    }
-
-    public void defMethod() {
-        ss.pop();
-        String methodName = symbolStack.pop();
-        String className = symbolStack.pop();
-
-        symbolTable.addMethod(className, methodName, memory.getCurrentCodeBlockAddress());
-
-        symbolStack.push(className);
-        symbolStack.push(methodName);
-    }
-
-    public void popClass() {
-        symbolStack.pop();
-    }
-
-    public void extend() {
-        ss.pop();
-        symbolTable.setSuperClass(symbolStack.pop(), symbolStack.peek());
-    }
-
-    public void defField() {
-        ss.pop();
-        symbolTable.addField(symbolStack.pop(), symbolStack.peek());
-    }
-
-    public void defVar() {
-        ss.pop();
-
-        String var = symbolStack.pop();
-        String methodName = symbolStack.pop();
-        String className = symbolStack.pop();
-
-        symbolTable.addMethodLocalVariable(className, methodName, var);
-
-        symbolStack.push(className);
-        symbolStack.push(methodName);
-    }
-
     public void methodReturn() {
         // TODO : call ok
 
@@ -515,19 +369,6 @@ public class CodeGenerator {
                 null);
 
         // symbolStack.pop();
-    }
-
-    public void defParam() {
-        // TODO : call Ok
-        ss.pop();
-        String param = symbolStack.pop();
-        String methodName = symbolStack.pop();
-        String className = symbolStack.pop();
-
-        symbolTable.addMethodParameter(className, methodName, param);
-
-        symbolStack.push(className);
-        symbolStack.push(methodName);
     }
 
     public void lastTypeBool() {
