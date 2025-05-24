@@ -5,6 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Stack;
+import java.util.EnumMap;
+import java.util.Map;
 
 import MiniJava.Log.Log;
 import MiniJava.codeGenerator.CodeGenerator;
@@ -18,6 +20,13 @@ public class Parser {
     private ParseTable parseTable;
     private lexicalAnalyzer lexicalAnalyzer;
     private CodeGenerator cg;
+    private static final Map<act, ActionHandler> handlers = new EnumMap<>(act.class);
+
+    static {
+        handlers.put(act.shift, new ShiftActionHandler());
+        handlers.put(act.reduce, new ReduceActionHandler());
+        handlers.put(act.accept, new AcceptActionHandler());
+    }
 
     public Parser() {
         parsStack = new Stack<Integer>();
@@ -51,33 +60,14 @@ public class Parser {
                 Log.print(currentAction.toString());
                 //Log.print("");
 
-                switch (currentAction.action) {
-                    case shift:
-                        parsStack.push(currentAction.number);
-                        lookAhead = lexicalAnalyzer.getNextToken();
-
-                        break;
-                    case reduce:
-                        Rule rule = rules.get(currentAction.number);
-                        for (int i = 0; i < rule.RHS.size(); i++) {
-                            parsStack.pop();
-                        }
-
-                        Log.print(/*"state : " +*/ parsStack.peek() + "\t" + rule.LHS);
-//                        Log.print("LHS : "+rule.LHS);
-                        parsStack.push(parseTable.getGotoTable(parsStack.peek(), rule.LHS));
-                        Log.print(/*"new State : " + */parsStack.peek() + "");
-//                        Log.print("");
-                        try {
-                            cg.semanticFunction(rule.semanticAction, lookAhead);
-                        } catch (Exception e) {
-                            Log.print("Code Genetator Error");
-                        }
-                        break;
-                    case accept:
-                        finish = true;
-                        break;
-                }
+                // Replace switch statement with polymorphism
+                ActionHandler handler = handlers.get(currentAction.action);
+                ActionHandler.ParseResult result = handler.execute(
+                    parsStack, parseTable, rules, cg, lexicalAnalyzer, currentAction, lookAhead
+                );
+                lookAhead = result.lookAhead;
+                finish = result.finish;
+                
                 Log.print("");
             } catch (Exception ignored) {
                 ignored.printStackTrace();
