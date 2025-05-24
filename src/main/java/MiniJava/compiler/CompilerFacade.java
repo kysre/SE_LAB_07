@@ -7,7 +7,6 @@ import java.util.Scanner;
 import MiniJava.errorHandler.ErrorHandler;
 import MiniJava.parser.Parser;
 
-
 public class CompilerFacade {
     public boolean compile(String sourceFilePath) {
         try {
@@ -22,4 +21,4 @@ public class CompilerFacade {
             return false;
         }
     }
-} 
+}
