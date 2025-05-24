@@ -5,9 +5,9 @@ package MiniJava.codeGenerator;
  */
 
 public class Address {
-    public int num;
-    public TypeAddress Type;
-    public varType varType;
+    private int num;
+    private TypeAddress Type;
+    private varType varType;
 
     public Address(int num, varType varType, TypeAddress Type) {
         this.num = num;
@@ -21,15 +21,28 @@ public class Address {
         this.varType = varType;
     }
 
+    // Refactor:Self Encapsulate Field pattern
+    public int getNum() {
+        return num;
+    }
+
+    public TypeAddress getType() {
+        return Type;
+    }
+
+    public varType getVarType() {
+        return varType;
+    }
+
     public String toString() {
-        switch (Type) {
+        switch (getType()) {
             case Direct:
-                return num + "";
+                return getNum() + "";
             case Indirect:
-                return "@" + num;
+                return "@" + getNum();
             case Imidiate:
-                return "#" + num;
+                return "#" + getNum();
         }
-        return num + "";
+        return getNum() + "";
     }
 }
