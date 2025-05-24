@@ -86,7 +86,10 @@ public class SymbolTable {
     }
 
     public Symbol getNextParam(String className, String methodName) {
-        return klasses.get(className).Methodes.get(methodName).getNextParameter();
+        Method method = klasses.get(className).Methodes.get(methodName);
+        Symbol currentParam = method.getCurrentParameter();
+        method.advanceParameterIndex();
+        return currentParam;
     }
 
     public void startCall(String className, String methodName) {
@@ -176,8 +179,16 @@ public class SymbolTable {
             index = 0;
         }
 
-        private Symbol getNextParameter() {
-            return parameters.get(orderdParameters.get(index++));
+        // Refactor: Separate Query from Modifier
+        private Symbol getCurrentParameter() {
+            if (index < orderdParameters.size()) {
+                return parameters.get(orderdParameters.get(index));
+            }
+            throw new IndexOutOfBoundsException("No more parameters available");
+        }
+        
+        private void advanceParameterIndex() {
+            index++;
         }
     }
 
