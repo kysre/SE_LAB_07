@@ -28,7 +28,7 @@ public class Parser {
     public Parser() {
         parsStack = new Stack<Integer>();
         parsStack.push(0);
-        
+
         // Refactor: Use Facade
         ParserSubsystemFacade subsystemFacade = ParserSubsystemFacade.createInitialized();
         this.parseTable = subsystemFacade.getParseTable();
@@ -43,40 +43,40 @@ public class Parser {
         Action currentAction;
         while (!finish) {
             try {
-                Log.print(/*"lookahead : "+*/ lookAhead.toString() + "\t" + parsStack.peek());
-//                Log.print("state : "+ parsStack.peek());
+                Log.print(/* "lookahead : "+ */ lookAhead.toString() + "\t" + parsStack.peek());
+                // Log.print("state : "+ parsStack.peek());
                 currentAction = parseTable.getActionTable(parsStack.peek(), lookAhead);
                 Log.print(currentAction.toString());
-                //Log.print("");
+                // Log.print("");
 
                 // Refactor: Replace switch statement with polymorphism
                 ActionHandler handler = handlers.get(currentAction.action);
-                ActionHandler.ParseResult result = handler.execute(
-                    parsStack, parseTable, rules, cg, lexicalAnalyzer, currentAction, lookAhead
-                );
+                ActionHandler.ParseResult result = handler.execute(parsStack, parseTable, rules, cg, lexicalAnalyzer,
+                        currentAction, lookAhead);
                 lookAhead = result.lookAhead;
                 finish = result.finish;
-                
+
                 Log.print("");
             } catch (Exception ignored) {
                 ignored.printStackTrace();
-//                boolean find = false;
-//                for (NonTerminal t : NonTerminal.values()) {
-//                    if (parseTable.getGotoTable(parsStack.peek(), t) != -1) {
-//                        find = true;
-//                        parsStack.push(parseTable.getGotoTable(parsStack.peek(), t));
-//                        StringBuilder tokenFollow = new StringBuilder();
-//                        tokenFollow.append(String.format("|(?<%s>%s)", t.name(), t.pattern));
-//                        Matcher matcher = Pattern.compile(tokenFollow.substring(1)).matcher(lookAhead.toString());
-//                        while (!matcher.find()) {
-//                            lookAhead = lexicalAnalyzer.getNextToken();
-//                        }
-//                    }
-//                }
-//                if (!find)
-//                    parsStack.pop();
+                // boolean find = false;
+                // for (NonTerminal t : NonTerminal.values()) {
+                // if (parseTable.getGotoTable(parsStack.peek(), t) != -1) {
+                // find = true;
+                // parsStack.push(parseTable.getGotoTable(parsStack.peek(), t));
+                // StringBuilder tokenFollow = new StringBuilder();
+                // tokenFollow.append(String.format("|(?<%s>%s)", t.name(), t.pattern));
+                // Matcher matcher = Pattern.compile(tokenFollow.substring(1)).matcher(lookAhead.toString());
+                // while (!matcher.find()) {
+                // lookAhead = lexicalAnalyzer.getNextToken();
+                // }
+                // }
+                // }
+                // if (!find)
+                // parsStack.pop();
             }
         }
-        if (!ErrorHandler.hasError) cg.printMemory();
+        if (!ErrorHandler.hasError)
+            cg.printMemory();
     }
 }
